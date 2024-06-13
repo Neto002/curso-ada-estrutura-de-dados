@@ -1,44 +1,37 @@
 package com.neto.dataStructure;
 
-public class LinkedList {
+public class LinkedList<T> {
 
-    private Node head;
-    private Node tail;
+    private Node<T> head;
+    private Node<T> tail;
     private int length;
 
-    public static class Node {
-        String data;
-        Node next;
+    public static class Node<T> {
+        T data;
+        Node<T> next;
 
-        Node(String data) {
+        Node(T data) {
             this.data = data;
         }
     }
 
-    public static void main(String[] args) {
-        LinkedList list = new LinkedList("elemento 1");
-        System.out.println(list.get(0));
+    public LinkedList() {
+        this.makeEmpty();
     }
 
-    public LinkedList(String data) {
+    public LinkedList(T data) {
         length = 1;
-        Node newNode = new Node(data);
+        Node<T> newNode = new Node<>(data);
         head = newNode;
         tail = newNode;
     }
 
-    public Node getHead() {
-        if (this.head == null) {
-            return null;
-        }
-        return this.head;
+    public T getHead() {
+        return this.head.data;
     }
 
-    public Node getTail() {
-        if (this.tail == null) {
-            return null;
-        }
-        return this.tail;
+    public T getTail() {
+        return this.tail.data;
     }
 
     public int getLength() {
@@ -53,7 +46,7 @@ public class LinkedList {
 
     public void print() {
         System.out.println("####################");
-        Node temp = this.head;
+        Node<T> temp = this.head;
         while (temp != null) {
             System.out.println(temp.data);
             temp = temp.next;
@@ -61,19 +54,34 @@ public class LinkedList {
         System.out.println("####################");
     }
 
-    public Node get(int index) {
-        if (index < 0 || index >= this.length) {
+    public T get(int index) {
+        if (invalidIndex(index)) {
             return null;
         }
-        Node temp = this.head;
+        Node<T> temp = this.head;
+        for (int i = 0; i < index; i++) {
+            temp = temp.next;
+        }
+        return temp.data;
+    }
+
+    private Node<T> getNode(int index) {
+        if (invalidIndex(index)) {
+            return null;
+        }
+        Node<T> temp = this.head;
         for (int i = 0; i < index; i++) {
             temp = temp.next;
         }
         return temp;
     }
 
-    public boolean set(int index, String data) {
-        Node temp = get(index);
+    private boolean invalidIndex(int index) {
+        return index < 0 || index >= this.length;
+    }
+
+    public boolean set(int index, T data) {
+        Node<T> temp = getNode(index);
 
         if (temp == null) {
             return false;
@@ -84,8 +92,8 @@ public class LinkedList {
         return true;
     }
 
-    public void prepend(String data) {
-        Node newNode = new Node(data);
+    public void prepend(T data) {
+        Node<T> newNode = new Node<>(data);
         if (length == 0) {
             head = newNode;
             tail = newNode;
@@ -96,8 +104,8 @@ public class LinkedList {
         length++;
     }
 
-    public void append(String data) {
-        Node newNode = new Node(data);
+    public void append(T data) {
+        Node<T> newNode = new Node<>(data);
         if (length == 0) {
             head = newNode;
             tail = newNode;
@@ -108,8 +116,8 @@ public class LinkedList {
         length++;
     }
 
-    public boolean insert(int index, String data) {
-        if (index < 0 || index >= this.length) {
+    public boolean insert(int index, T data) {
+        if (invalidIndex(index)) {
             return false;
         }
 
@@ -123,9 +131,14 @@ public class LinkedList {
             return true;
         }
 
-        Node newNode = new Node(data);
+        Node<T> newNode = new Node<>(data);
 
-        Node temp = get(index - 1);
+        Node<T> temp = getNode(index - 1);
+
+        if (temp == null) {
+            return false;
+        }
+
         newNode.next = temp.next;
         temp.next = newNode;
         length++;
@@ -133,12 +146,12 @@ public class LinkedList {
         return true;
     }
 
-    public Node removeFirst() {
+    public Node<T> removeFirst() {
         if (length == 0) {
             return null;
         }
 
-        Node temp = this.head;
+        Node<T> temp = this.head;
         this.head = this.head.next;
         temp.next = null;
 
@@ -151,13 +164,13 @@ public class LinkedList {
         return temp;
     }
 
-    public Node removeLast() {
+    public Node<T> removeLast() {
         if (length == 0) {
             return null;
         }
 
-        Node temp = this.head;
-        Node removed = null;
+        Node<T> temp = this.head;
+        Node<T> removed = null;
 
         while (temp.next != this.tail) {
             temp = temp.next;
@@ -176,8 +189,8 @@ public class LinkedList {
         return removed;
     }
 
-    public Node delete(int index) {
-        if (index < 0 || index >= this.length) {
+    public Node<T> delete(int index) {
+        if (invalidIndex(index)) {
             return null;
         }
 
@@ -189,8 +202,13 @@ public class LinkedList {
             return removeLast();
         }
 
-        Node prev = get(index - 1);
-        Node current = prev.next;
+        Node<T> prev = getNode(index - 1);
+
+        if (prev == null) {
+            return null;
+        }
+
+        Node<T> current = prev.next;
 
         prev.next = current.next;
         current.next = null;
